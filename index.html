@@ -1,27 +1,127 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LuaNest - Home</title>
-    <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-    <header>
-        <h1>Welcome to LuaNest</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="features.html">Features</a>
-            <a href="download.html">Download</a>
-        </nav>
-    </header>
-    
-    <section class="hero">
-        <h2>Roblox Scripting Made Easy with LuaNest</h2>
-        <p>The ultimate tool for creating and managing Roblox scripts seamlessly.</p>
-        <button id="downloadBtn">Download Now</button>
-    </section>
+  <body style="background-color: rgb(201, 201, 201);">
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
 
-    <script src="script.js"></script>
-</body>
+    <header style="background-color: rgb(58, 172, 201); padding: 20px 0; margin: 0;">
+      <p style="text-align: center; font-size: 80px; margin: 0; font-family: 'Courier New', Courier, monospace;">Jur Jansen</p>
+    </header>
+
+    <div style="text-align: center; padding-top: 5px; padding-bottom: 10px;" id="photo">
+      <img id="profileImage" src="cat.jpg" alt="photo" style="width: 300px; height: 300px; border-radius: 50%;"> 
+    </div>
+
+    <div style="width: 500px; height: 225px; background-color: lightblue; margin: 0 auto;" id="Info">
+      <h2 style="padding-left: 10px; padding-top: 10px; margin: 2px;">Verjaardag: 28/nov</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Kantoornr: 102</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Email: jur.jansen@student.gildeopleidingen.nl</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Tel: +31 06 57682697</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Hobby's: Gamen en slapen</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Huisdieren: 5 katten en 2 honden</h2>
+      <h2 style="padding-left: 10px; margin: 2px;">Fav boek: Ik lees geen boeken</h2>      
+    </div>
+
+    <div id="funButton" style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+      <button id="toggleBtn" style="width: 375px; height: 100px; font-size: 50px; font-weight: bold; background-color: darkgrey; color: red;">
+        Verander foto
+      </button>
+    </div>
+
+    <!-- Blackjack spel -->
+    <div id="blackjack" style="text-align: center; margin-top: 30px; padding: 20px; background-color: #8b8b8b; border-radius: 15px; width: 600px; margin-left: auto; margin-right: auto;">
+      <h2>Blackjack 21</h2>
+      <div id="player-hand" style="margin: 10px; font-size: 20px;"></div>
+      <div id="dealer-hand" style="margin: 10px; font-size: 20px;"></div>
+      <button onclick="startGame()" style="margin: 5px; padding: 10px 20px; font-size: 18px;">Deel kaarten</button>
+      <button onclick="hit()" style="margin: 5px; padding: 10px 20px; font-size: 18px;">Kaart nemen</button>
+      <button onclick="stand()" style="margin: 5px; padding: 10px 20px; font-size: 18px;">Passen</button>
+      <p id="result" style="font-weight: bold; margin-top: 15px; font-size: 22px;"></p>
+    </div>
+
+    <script>
+      // Foto wisselen
+      const button = document.getElementById("toggleBtn");
+      const img = document.getElementById("profileImage");
+
+      button.addEventListener("click", () => {
+        if (img.src.includes("cat.jpg")) {
+          img.src = "grump.jpg";
+        } else {
+          img.src = "cat.jpg";
+        }
+      });
+
+      // Blackjack
+      const suits = ["♠", "♥", "♦", "♣"];
+      const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+      let deck, playerHand, dealerHand;
+
+      function createDeck() {
+        deck = [];
+        for (let s of suits) {
+          for (let v of values) {
+            deck.push({suit: s, value: v});
+          }
+        }
+        deck.sort(() => Math.random() - 0.5); // shuffle
+      }
+
+      function cardValue(card) {
+        if (["J","Q","K"].includes(card.value)) return 10;
+        if (card.value === "A") return 11; 
+        return parseInt(card.value);
+      }
+
+      function handValue(hand) {
+        let value = hand.reduce((sum, card) => sum + cardValue(card), 0);
+        let aces = hand.filter(c => c.value === "A").length;
+        while (value > 21 && aces > 0) {
+          value -= 10;
+          aces--;
+        }
+        return value;
+      }
+
+      function startGame() {
+        createDeck();
+        playerHand = [deck.pop(), deck.pop()];
+        dealerHand = [deck.pop(), deck.pop()];
+        renderHands();
+        document.getElementById("result").innerText = "";
+      }
+
+      function hit() {
+        playerHand.push(deck.pop());
+        renderHands();
+        if (handValue(playerHand) > 21) {
+          document.getElementById("result").innerText = "BUST! Je bent af";
+        }
+      }
+
+      function stand() {
+        while (handValue(dealerHand) < 17) {
+          dealerHand.push(deck.pop());
+        }
+        renderHands();
+        let playerScore = handValue(playerHand);
+        let dealerScore = handValue(dealerHand);
+        if (dealerScore > 21 || playerScore > dealerScore) {
+          document.getElementById("result").innerText = "Jij wint";
+        } else if (playerScore < dealerScore) {
+          document.getElementById("result").innerText = "Dealer wint";
+        } else {
+          document.getElementById("result").innerText = "Gelijkspel";
+        }
+      }
+
+      function renderHands() {
+        document.getElementById("player-hand").innerText = "Jij: " + playerHand.map(c => c.value + c.suit).join(" ");
+        document.getElementById("dealer-hand").innerText = "Dealer: " + dealerHand.map(c => c.value + c.suit).join(" ");
+      }
+    </script>
+  </body>
 </html>
+
